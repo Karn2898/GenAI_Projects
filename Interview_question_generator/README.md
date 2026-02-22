@@ -9,4 +9,4 @@ conda activate Interview
 
 2. Install Requirements :
 
-pip install -r Requirements.txt
+pip install -r Requirements.txtś
