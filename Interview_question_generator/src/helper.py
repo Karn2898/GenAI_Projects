@@ -13,3 +13,43 @@ from src.prompt import *
 load_dotenv()
 HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
 os.environ['HUGGINGFACE_TOKEN'] = HUGGINGFACE_TOKEN
+#data preprocessing
+loader=PyPDFLoader(file_path)
+data=loader.load()
+df['data']=df['data'].str.lower()
+
+def remove_url(data):
+  pattern=re.compile(r'http?://S+|.S+')
+  return pattern.sub(r'',text)
+  remove_url(data)
+  
+for page in data:
+  question_gen+=page.page_content
+
+from langchain_text_splitters import CharacterTextSplitter, TokenTextSplitter
+split_question_gen=TokenTextSplitter(
+    encoding_name="cl100k_base",
+    chunk_size=10000,
+    chunk_overlap=200
+)
+
+chunk_ques_gen=split_question_gen.split_text(question_gen)
+
+from langchain_core.documents import Document
+document_question_gen=[Document(page_content=t) for t in chunk_ques_gen]
+document_question_gen
+
+splitter_ans_gen=TokenTextSplitter(
+  encoding_name="cl100k_base",
+  chunk_size=1000,
+  chunk_overlap=100
+)
+
+document_ans_gen=splitter_ans_gen.split_documents(
+    document_question_gen
+)
+
+return document_question_gen  , document_ans_gen
+
+def llm_pipeline(file_path):
+    document_question_gen , document_ans_gen = file_processing(file_path)
