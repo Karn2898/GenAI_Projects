@@ -53,3 +53,17 @@ return document_question_gen  , document_ans_gen
 
 def llm_pipeline(file_path):
     document_question_gen , document_ans_gen = file_processing(file_path)
+    
+    llm_question_ge_pipeline=ChatHuggingFace(
+        temperature= 0.3 ,
+        model=""
+    )
+    
+    PROMPT_QUESTIONS=ChatPromptTemplate(template=prompt_template , input_variables =["text"])
+    
+    REFINE_PROMPT=ChatPromptTemplate(input_variables=["exixting_answer", "text"],
+                                     template=refine_template)
+    
+    ques_gen_chain=load_summarize_chain(ll=llm_ques_gen_pipeline,
+                                        chain_type="refine")
+    
