@@ -18,3 +18,9 @@ async def chat(request: Request , pdf_file :bytes =File(), filename :str =Form(.
         await f.write(pdf_file)
     response_data= jsonable_encoder(json.dumps({"msg": 'success' , "pdf_filename": pdf_filename}))  res=Response(response_data) return res
     
+    
+def get_csv(file_path):
+    answer_generation_chain , ques_list =llm_pipeline(file_path)
+    base_folder='static/output/'
+    if not os.path.isdir(base_folder):
+        
