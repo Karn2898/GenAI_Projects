@@ -1,3 +1,5 @@
+import csv
+
 from setuptools import find_packages , setup
 setup(name="Interview question Generator",
       version="0.0.0",
@@ -23,4 +25,17 @@ def get_csv(file_path):
     answer_generation_chain , ques_list =llm_pipeline(file_path)
     base_folder='static/output/'
     if not os.path.isdir(base_folder):
+      
+        os.mkdir(base_folder) 
+    output_file=base_folder + "QA.csv"
+    with open(output_file , "w", newline = "" ,encoding="utf-8") as csvfile: 
+        csv_writer= csv.writer(csvfile)
+        csv_writer.writerow(["Question" , "Answer"])
         
+        for question in ques_list:
+            print("Question:", question)
+            answer = answer_generation_chain.run(question)
+            print("Answer:" answer)
+            
+            csv_writer.writerow([question , answer])
+    return output_file
