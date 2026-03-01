@@ -423,4 +423,4 @@ For issues or questions:
 
 ---
 
-**Happy generating! 🎓**
+**Happy generating!**
