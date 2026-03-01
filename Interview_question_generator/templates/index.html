@@ -310,7 +310,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>📚 Interview Question Generator</h1>
+            <h1>Interview Question Generator</h1>
             <p>Upload your document and generate AI-powered interview questions</p>
         </header>
 
@@ -318,7 +318,7 @@
             <form id="uploadForm" enctype="multipart/form-data">
                 <div class="upload-section">
                     <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">📄</div>
+                        <div class="upload-icon">PDF</div>
                         <div class="upload-text">
                             <strong>Drag & Drop your PDF file here</strong><br>
                             or click to browse
@@ -369,10 +369,10 @@
                     Generated Interview Questions
                 </div>
                 <div class="results-body" id="resultsBody">
-                    <!-- Questions will be dynamically inserted here -->
+                    
                 </div>
                 <button class="download-btn" id="downloadBtn">
-                    📥 Download Questions as JSON
+                    Download Questions as JSON
                 </button>
             </div>
         </div>
@@ -454,10 +454,8 @@
             }
 
             const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            formData.append('num_questions', document.getElementById('numQuestions').value);
-            formData.append('difficulty', document.getElementById('difficulty').value);
-            formData.append('topic', document.getElementById('topic').value);
+            formData.append('pdf_file', fileInput.files[0]);
+            formData.append('filename', fileInput.files[0].name);
 
             // Show loading, hide results and errors
             loading.classList.add('show');
@@ -466,8 +464,7 @@
             generateBtn.disabled = true;
 
             try {
-                // Replace '/generate' with your actual API endpoint
-                const response = await fetch('/generate', {
+                const response = await fetch('/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -477,10 +474,14 @@
                 }
 
                 const data = await response.json();
-                generatedQuestions = data.questions || data;
+                generatedQuestions = [
+                    {
+                        question: `File uploaded successfully: ${data.pdf_filename || fileInput.files[0].name}`
+                    }
+                ];
                 displayResults(generatedQuestions);
             } catch (error) {
-                showError('Error generating questions: ' + error.message);
+                showError('Error uploading file: ' + error.message);
             } finally {
                 loading.classList.remove('show');
                 generateBtn.disabled = false;
