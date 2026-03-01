@@ -32,9 +32,29 @@ async def chat(request: Request , pdf_file :bytes =File(), filename :str =Form(.
         await f.write(pdf_file)
     response_data = jsonable_encoder({
         "msg": "success",
-        "pdf_filename": f"/static/docs/{filename}"
+        "pdf_filename": f"/static/docs/{filename}",
+        "file_path": pdf_filename
     })
     return Response(content=json.dumps(response_data), media_type="application/json")
+
+@app.post("/generate")
+async def generate_questions(request: Request, file_path: str = Form(...), num_questions: int = Form(10)):
+    try:
+        from helper import llm_pipeline
+        
+        # Generate questions using the helper pipeline
+        question_list = llm_pipeline(file_path, num_questions)
+        
+        # Format questions for frontend
+        questions = [{"question": q} for q in question_list]
+        
+        return {"questions": questions, "total": len(questions)}
+        
+    except Exception as e:
+        import traceback
+        error_msg = f"{str(e)}\n{traceback.format_exc()}"
+        print("Error generating questions:", error_msg)
+        return {"error": str(e), "questions": []}
     
     
 def get_csv(file_path):
