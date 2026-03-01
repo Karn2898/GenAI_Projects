@@ -1,5 +1,10 @@
 # Interview Question Generator
 
+
+
+https://github.com/user-attachments/assets/0d71c7a9-3b2b-4f62-b9d5-094583c6e594
+
+
 An AI-powered application that automatically generates interview questions from PDF documents. Upload your PDF, and the system will extract key concepts and generate relevant interview questions with optional AI enhancement using HuggingFace.
 
 ## Features
