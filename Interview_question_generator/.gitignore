@@ -1,5 +1,31 @@
+# Environment
 .env
+.env.local
+
+# Virtual environments
+venv/
+env/
+ENV/
+interview/
+.venv/
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
-Interview/
+*.py[cod]
+*$py.class
+*.so
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project runtime files
+static/docs/
+static/output/
+src/static/
+*.pdf
+
