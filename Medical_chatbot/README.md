@@ -1,5 +1,8 @@
 # Medical Chatbot using Flask,LangChain, Pinecone , NVIDIA NIM
 
+<img width="1366" height="768" alt="Annotation 2026-03-21 160549" src="https://github.com/user-attachments/assets/1a52eab8-2c7b-41e9-8872-194e416af0cd" />
+
+
 This project is a Retrieval-Augmented Generation (RAG) medical chatbot.
 It answers user questions by retrieving relevant chunks from local medical PDF files and passing that context to an LLM.
 
