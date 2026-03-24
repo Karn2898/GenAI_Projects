@@ -28,7 +28,7 @@ Let me know what you would like to order -
 
 ## Beverages
 
-- Coke, Sprite, Fanta, or Diet Coke (Can) -$1.5 0
+- Coke, Sprite, Fanta, or Diet Coke (Can) -$1.50
 - Water Bottle -$1.00
 - Juice Box (Apple, Orange, or Cranberry) -$1.50
 - Milkshake (Chocolate, Vanilla, or Strawberry) -$3.99
