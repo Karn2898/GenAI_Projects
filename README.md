@@ -19,14 +19,14 @@ A collection of Generative AI projects built with LLMs, RAG pipelines, and moder
 
 ## Projects Overview
 
-| Project | Type | Framework | LLM | Status |
-|---|---|---|---|---|
-| [LLM Fine-Tuning](#1-llm-fine-tuning-llama-2) | Notebook | Hugging Face / TRL | Llama-2-7B | Complete |
-| [Interview Question Generator](#2-interview-question-generator) | Web App | FastAPI | HuggingFace Hub | Complete |
-| [Medical Chatbot](#3-medical-chatbot) | Web App | Flask | NVIDIA Llama-3.1-70B |  Complete |
-| [Web Bot](#4-web-bot) | Web App | LangChain | Any | [In Development] |
-| [Website Chatbot Notebook](#5-website-chatbot-notebook) | Notebook | LangChain | HuggingFace Hub |  Complete |
-| [Zomato Chatbot](#6-zomato-chatbot) | Web App | Chainlit | OpenAI-compatible | Complete |
+| Project | Type | Framework | LLM | Deployment | Status |
+|---|---|---|---|---|---|
+| [LLM Fine-Tuning](#1-llm-fine-tuning-llama-2) | Notebook | Hugging Face / TRL | Llama-2-7B | — | Complete |
+| [Interview Question Generator](#2-interview-question-generator) | Web App | FastAPI | HuggingFace Hub | — | Complete |
+| [Medical Chatbot](#3-medical-chatbot) | Web App | Flask | NVIDIA Llama-3.1-70B | AWS ECR + EC2 | Complete |
+| [Web Bot](#4-web-bot) | Web App | LangChain | Any | — | [In Development] |
+| [Website Chatbot Notebook](#5-website-chatbot-notebook) | Notebook | LangChain | HuggingFace Hub | — | Complete |
+| [Zomato Chatbot](#6-zomato-chatbot) | Web App | Chainlit | OpenAI-compatible | — | Complete |
 
 ---
 
@@ -86,7 +86,7 @@ uvicorn src.app:app --reload
 
 **Directory:** `Medical_chatbot/`
 
-A **RAG (Retrieval-Augmented Generation)** chatbot that answers medical questions by semantically searching local PDF medical documents and generating responses with NVIDIA's Llama-3.1-70B model.
+A **RAG (Retrieval-Augmented Generation)** chatbot that answers medical questions by semantically searching local PDF medical documents and generating responses with NVIDIA's Llama-3.1-70B model. The app is containerised with Docker and deployed to **AWS EC2 via Amazon ECR** through a GitHub Actions CI/CD pipeline.
 
 **Key Features:**
 - PDF ingestion, chunking (500 chars / 20 overlap), and embedding generation
@@ -94,8 +94,9 @@ A **RAG (Retrieval-Augmented Generation)** chatbot that answers medical question
 - Embeddings via `sentence-transformers/all-MiniLM-L6-v2`
 - LLM responses from `meta/llama-3.1-70b-instruct` via NVIDIA AI Endpoints
 - Flask-based chat web interface
+- Dockerised and deployed to AWS EC2 via ECR through GitHub Actions CI/CD
 
-**Technologies:** `Flask`, `LangChain`, `Pinecone`, `NVIDIA AI Endpoints`, `sentence-transformers`, `pypdf`, `python-dotenv`
+**Technologies:** `Flask`, `LangChain`, `Pinecone`, `NVIDIA AI Endpoints`, `sentence-transformers`, `pypdf`, `python-dotenv`, `Docker`, `AWS ECR`, `AWS EC2`
 
 **Environment Variables:**
 ```
@@ -111,6 +112,8 @@ pip install -r requirements.txt
 python store_index.py   # Index PDFs into Pinecone
 python app.py           # Start Flask server
 ```
+
+**AWS CI/CD:** On every push to `main`, GitHub Actions builds the Docker image, pushes it to Amazon ECR, and deploys it to an EC2 instance over SSH. See `Medical_chatbot/README.md` for the full AWS setup guide.
 
 ---
 
@@ -196,6 +199,7 @@ chainlit run app.py
 | **Embeddings** | sentence-transformers, HuggingFace Embeddings, OpenAI Embeddings |
 | **PDF Processing** | PyPDF2, pypdf, unstructured |
 | **Fine-Tuning** | peft (LoRA), trl (SFT), bitsandbytes (quantization) |
+| **Deployment** | Docker, AWS ECR, AWS EC2, GitHub Actions CI/CD |
 | **Others** | Jinja2, aiofiles, tiktoken, python-dotenv |
 
 ---

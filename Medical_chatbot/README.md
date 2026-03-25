@@ -149,9 +149,106 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 - NVIDIA AI Endpoints
 - Hugging Face sentence-transformers
 
+## Docker
+
+A `dockerfile` is included in the project root. It uses a `python:3.10-slim-buster` base image, copies the application, installs dependencies, exposes port `8080`, and starts the Flask app.
+
+```bash
+docker build -t medical-chatbot .
+docker run -d -p 8080:8080 \
+  -e PINECONE_API_KEY=<your_key> \
+  -e NVIDIA_API_KEY=<your_key> \
+  -e PINECONE_INDEX_NAME=medicalbot \
+  medical-chatbot
+```
+
+---
+
+## AWS Deployment (CI/CD)
+
+The project includes a GitHub Actions workflow (`workflows/cicd.yaml`) that automatically builds and deploys the Docker image to an AWS EC2 instance via Amazon ECR on every push to `main`.
+
+### Architecture
+
+```
+GitHub push to main
+       │
+       ▼
+GitHub Actions CI job
+  ├── Configure AWS credentials
+  ├── Log in to Amazon ECR
+  ├── Create ECR repository (if absent)
+  └── Build & push Docker image to ECR
+       │
+       ▼
+GitHub Actions CD job
+  ├── Configure AWS credentials
+  ├── Log in to Amazon ECR
+  └── SSH into EC2 → pull latest image → restart container
+```
+
+### Required GitHub Secrets
+
+Add these secrets under **Settings → Secrets and variables → Actions** in your GitHub repository:
+
+| Secret | Description |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | AWS IAM access key ID |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM secret access key |
+| `AWS_DEFAULT_REGION` | AWS region (e.g. `us-east-1`) |
+| `ECR_REPOSITORY` | ECR repository name (e.g. `medical-chatbot`) |
+| `EC2_HOST` | Public IP or hostname of your EC2 instance |
+| `EC2_USERNAME` | SSH login user (e.g. `ubuntu`, `ec2-user`) |
+| `EC2_SSH_KEY` | Private SSH key for EC2 access |
+| `PINECONE_API_KEY` | Pinecone API key (injected into the container) |
+| `NVIDIA_API_KEY` | NVIDIA API key (injected into the container) |
+
+### One-Time AWS Setup
+
+**1. Create an IAM user** with programmatic access and attach policies for:
+- `AmazonEC2ContainerRegistryFullAccess`
+- `AmazonEC2FullAccess` (or a scoped policy allowing `ec2:DescribeInstances`)
+
+**2. Launch an EC2 instance** (Ubuntu recommended):
+- Open inbound port `8080` in the security group.
+- Install Docker on the instance:
+
+```bash
+sudo apt update && sudo apt install -y docker.io
+sudo usermod -aG docker $USER
+```
+
+- Install the AWS CLI and configure credentials so the instance can pull from ECR:
+
+```bash
+sudo apt install -y awscli
+aws configure   # enter the same IAM credentials
+```
+
+**3. Create an ECR repository** (the workflow creates it automatically if it does not exist, but you can also create it manually):
+
+```bash
+aws ecr create-repository --repository-name medical-chatbot --region <your-region>
+```
+
+### Deployment Flow
+
+Once the secrets are configured:
+
+1. Push any change to the `main` branch.
+2. The **CI job** builds the Docker image and pushes it to ECR.
+3. The **CD job** SSHs into the EC2 instance, pulls the new image, stops the old container, and starts a fresh one with all required environment variables injected.
+
+The application will be available at:
+
+```
+http://<EC2_HOST>:8080
+```
+
+---
+
 ## Future Improvements
 
 - Add chat history memory
 - Add source citations in responses
-- Add Docker support
 - Add automated tests
