@@ -25,6 +25,17 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Validate ECR repository name
+      env:
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      run: |
+        if [ -z "$ECR_REPOSITORY" ]; then
+          echo "ECR_REPOSITORY secret is empty or missing."
+          echo "Set it in GitHub: Settings -> Secrets and variables -> Actions -> New repository secret"
+          echo "Example value: medical-chatbot"
+          exit 1
+        fi
+
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
