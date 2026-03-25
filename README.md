@@ -21,12 +21,12 @@ A collection of Generative AI projects built with LLMs, RAG pipelines, and moder
 
 | Project | Type | Framework | LLM | Status |
 |---|---|---|---|---|
-| [LLM Fine-Tuning](#1-llm-fine-tuning-llama-2) | Notebook | Hugging Face / TRL | Llama-2-7B | ✅ Complete |
-| [Interview Question Generator](#2-interview-question-generator) | Web App | FastAPI | HuggingFace Hub | ✅ Complete |
-| [Medical Chatbot](#3-medical-chatbot) | Web App | Flask | NVIDIA Llama-3.1-70B | ✅ Complete |
+| [LLM Fine-Tuning](#1-llm-fine-tuning-llama-2) | Notebook | Hugging Face / TRL | Llama-2-7B | Complete |
+| [Interview Question Generator](#2-interview-question-generator) | Web App | FastAPI | HuggingFace Hub | Complete |
+| [Medical Chatbot](#3-medical-chatbot) | Web App | Flask | NVIDIA Llama-3.1-70B |  Complete |
 | [Web Bot](#4-web-bot) | Web App | LangChain | Any | [In Development] |
-| [Website Chatbot Notebook](#5-website-chatbot-notebook) | Notebook | LangChain | HuggingFace Hub | ✅ Complete |
-| [Zomato Chatbot](#6-zomato-chatbot) | Web App | Chainlit | OpenAI-compatible | ✅ Complete |
+| [Website Chatbot Notebook](#5-website-chatbot-notebook) | Notebook | LangChain | HuggingFace Hub |  Complete |
+| [Zomato Chatbot](#6-zomato-chatbot) | Web App | Chainlit | OpenAI-compatible | Complete |
 
 ---
 
