@@ -73,6 +73,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
 
     - name: Validate EC2 connection secrets
+      id: validate-ec2
       env:
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
@@ -83,15 +84,19 @@ jobs:
         [ -z "$EC2_USERNAME" ] && missing+=("EC2_USERNAME")
         [ -z "$EC2_SSH_KEY" ]  && missing+=("EC2_SSH_KEY")
         if [ ${#missing[@]} -gt 0 ]; then
-          echo "The following required secrets are missing: ${missing[*]}"
+          echo "::warning::The following required secrets are missing: ${missing[*]}"
           echo "Set them in GitHub: Settings -> Secrets and variables -> Actions -> New repository secret"
           echo "  EC2_HOST      - Public IP or hostname of your EC2 instance"
           echo "  EC2_USERNAME  - SSH login user (e.g. ubuntu, ec2-user)"
           echo "  EC2_SSH_KEY   - Private SSH key used to connect to the instance"
-          exit 1
+          echo "Skipping deployment."
+          echo "ec2_ready=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "ec2_ready=true" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Deploy Docker Image to EC2
+      if: steps.validate-ec2.outputs.ec2_ready == 'true'
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
