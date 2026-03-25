@@ -12,18 +12,18 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Validate ECR repository name
       env:
@@ -35,6 +35,14 @@ jobs:
           echo "Example value: medical-chatbot"
           exit 1
         fi
+
+    - name: Create ECR repository if it does not exist
+      env:
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: |
+        aws ecr describe-repositories --repository-names "$ECR_REPOSITORY" --region "$AWS_DEFAULT_REGION" \
+          || aws ecr create-repository --repository-name "$ECR_REPOSITORY" --region "$AWS_DEFAULT_REGION"
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
@@ -54,7 +62,7 @@ jobs:
 
     steps:
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -62,26 +70,24 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Validate deployment secrets
+    - name: Validate EC2 connection secrets
       env:
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: |
-        missing=0
-        for var in EC2_HOST EC2_USERNAME EC2_SSH_KEY ECR_REPOSITORY AWS_DEFAULT_REGION; do
-          if [ -z "${!var}" ]; then
-            echo "$var secret is empty or missing."
-            missing=1
-          fi
-        done
-
-        if [ "$missing" -eq 1 ]; then
-          echo "Set required secrets in: Settings -> Secrets and variables -> Actions"
+        missing=()
+        [ -z "$EC2_HOST" ]     && missing+=("EC2_HOST")
+        [ -z "$EC2_USERNAME" ] && missing+=("EC2_USERNAME")
+        [ -z "$EC2_SSH_KEY" ]  && missing+=("EC2_SSH_KEY")
+        if [ ${#missing[@]} -gt 0 ]; then
+          echo "The following required secrets are missing: ${missing[*]}"
+          echo "Set them in GitHub: Settings -> Secrets and variables -> Actions -> New repository secret"
+          echo "  EC2_HOST      - Public IP or hostname of your EC2 instance"
+          echo "  EC2_USERNAME  - SSH login user (e.g. ubuntu, ec2-user)"
+          echo "  EC2_SSH_KEY   - Private SSH key used to connect to the instance"
           exit 1
         fi
 
