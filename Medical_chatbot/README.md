@@ -205,25 +205,23 @@ Add these secrets under **Settings → Secrets and variables → Actions** in yo
 
 ### One-Time AWS Setup
 
+> **Important:** The EC2 deployment step is skipped unless all three secrets `EC2_HOST`, `EC2_USERNAME`, and `EC2_SSH_KEY` are configured. Without them the Docker image is built and pushed to ECR but never deployed to the instance.
+
 **1. Create an IAM user** with programmatic access and attach policies for:
 - `AmazonEC2ContainerRegistryFullAccess`
 - `AmazonEC2FullAccess` (or a scoped policy allowing `ec2:DescribeInstances`)
 
 **2. Launch an EC2 instance** (Ubuntu recommended):
-- Open inbound port `8080` in the security group.
+- Open inbound port `8080` in the security group so the app is reachable from the internet.
 - Install Docker on the instance:
 
 ```bash
-sudo apt update && sudo apt install -y docker.io
+sudo apt update && sudo apt install -y docker.io awscli
 sudo usermod -aG docker $USER
+# Log out and back in (or start a new session) for the group change to take effect.
 ```
 
-- Install the AWS CLI and configure credentials so the instance can pull from ECR:
-
-```bash
-sudo apt install -y awscli
-aws configure   # enter the same IAM credentials
-```
+> **Note:** The workflow passes the AWS credentials from GitHub Secrets directly to the `aws ecr get-login-password` command on the EC2 instance, so no separate `aws configure` step is required on the instance itself.
 
 **3. Create an ECR repository** (the workflow creates it automatically if it does not exist, but you can also create it manually):
 
