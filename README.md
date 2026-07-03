@@ -15,7 +15,7 @@ A collection of Generative AI projects built with LLMs, RAG pipelines, and moder
 - [Tech Stack Summary](#tech-stack-summary)
 - [Author](#author)
 
----
+--- 
 
 ## Projects Overview
 
